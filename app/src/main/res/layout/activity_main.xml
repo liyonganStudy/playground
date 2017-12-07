@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -12,25 +12,10 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.demo.playground.MainActivity">
 
-    <com.demo.playground.widget.PrinterShimmerTextView
-        android:id="@+id/text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="近期热评"
-        android:textSize="25sp"
-        app:auto_start="true"/>
-
-    <com.demo.playground.widget.ShimmerFrameLayout
-        android:id="@+id/shimmerLayout"
-        android:layout_below="@id/text"
+    <Button
+        android:id="@+id/openSnowAnimate"
+        android:text="打开飘雪动画"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <Button
-            android:id="@+id/button"
-            android:text="start"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-    </com.demo.playground.widget.ShimmerFrameLayout>
+        android:layout_height="wrap_content"/>
 
-
-</RelativeLayout>
+</LinearLayout>

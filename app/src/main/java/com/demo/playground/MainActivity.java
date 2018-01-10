@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import com.demo.playground.lockscreen.LockScreenActivity;
 import com.demo.playground.snowanimate.SnowAnimateActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -17,6 +18,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 SnowAnimateActivity.launch(MainActivity.this);
+            }
+        });
+
+        findViewById(R.id.openLockScreen).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LockScreenActivity.launch(MainActivity.this);
             }
         });
     }

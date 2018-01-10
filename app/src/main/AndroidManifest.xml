@@ -18,6 +18,8 @@
         </activity>
         <activity android:name=".snowanimate.SnowAnimateActivity">
         </activity>
+        <activity android:name=".lockscreen.LockScreenActivity">
+        </activity>
     </application>
 
 </manifest>

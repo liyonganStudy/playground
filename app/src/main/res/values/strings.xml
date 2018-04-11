@@ -2,4 +2,8 @@
     <string name="app_name">Playground</string>
     <string name="openActivity">打开%s</string>
     <string name="follow">关注</string>
+    <string name="hidesystemui">hideSystemUI</string>
+    <string name="toggleStatusbarVisi">toggleStatusBar</string>
+    <string name="toggleStatusBar">toggleStatusBarColor</string>
+    <string name="toggleBehindStatusBar">toggleBehindStatusBar</string>
 </resources>

@@ -19,7 +19,8 @@
         <activity android:name=".snowanimate.SnowAnimateActivity" />
         <activity android:name=".lockscreen.LockScreenActivity" />
         <activity android:name=".scrolllyric.ScrollLyricActivity" />
-        <activity android:name=".animation.SimpleAnimationActivity"></activity>
+        <activity android:name=".immersivemode.ImmersiveModeActivity" />
+        <activity android:name=".animation.SimpleAnimationActivity" />
     </application>
 
 </manifest>

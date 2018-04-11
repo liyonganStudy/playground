@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
             }
             final String activityName = getItem(position);
             Button button = ((Button) convertView.findViewById(R.id.openActivity));
-            button.setText(mContext.getString(R.string.openActivity, activityName.substring(mContext.getPackageName().length() + 1)));
+            button.setText(mContext.getString(R.string.openActivity, activityName.substring(activityName.lastIndexOf(".") + 1)));
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

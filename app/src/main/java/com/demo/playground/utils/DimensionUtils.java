@@ -47,4 +47,7 @@ public class DimensionUtils {
         return context.getResources().getDisplayMetrics().heightPixels;
     }
 
+    public static int dimen2px(Context context, int dimen) {
+        return context.getResources().getDimensionPixelSize(dimen);
+    }
 }

@@ -16,9 +16,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".snowanimate.SnowAnimateActivity"></activity>
-        <activity android:name=".lockscreen.LockScreenActivity"></activity>
-        <activity android:name=".scrolllyric.ScrollLyricActivity"></activity>
+        <activity android:name=".snowanimate.SnowAnimateActivity" />
+        <activity android:name=".lockscreen.LockScreenActivity" />
+        <activity android:name=".scrolllyric.ScrollLyricActivity" />
+        <activity android:name=".animation.SimpleAnimationActivity"></activity>
     </application>
 
 </manifest>

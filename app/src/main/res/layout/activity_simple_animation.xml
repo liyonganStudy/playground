@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.demo.playground.animation.SimpleAnimationActivity">
+
+    <com.demo.playground.animation.FollowButton
+        android:id="@+id/followButton"
+        android:layout_width="@dimen/followButtonWidth"
+        android:layout_height="@dimen/followButtonHeight"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="17dp"
+        android:layout_marginTop="13dp"
+        android:gravity="center"
+        android:text="@string/follow"
+        android:textColor="#fff"
+        android:textSize="13sp" />
+</RelativeLayout>

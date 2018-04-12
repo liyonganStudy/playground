@@ -6,13 +6,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 import com.demo.playground.R;
 import com.demo.playground.utils.CompatibleUtils;
 
 public class ImmersiveModeActivity extends AppCompatActivity {
 
-    private View mDecorView;
+    private View mDecorView, mContainer;
+    private TextView mToggleStatusBarVisi, mToggleBehindStatusBar, mTextView;
     private int mStatusBarColor;
     private boolean mTransparentStatusBar;
     private boolean mStatusBarHide;
@@ -28,7 +30,8 @@ public class ImmersiveModeActivity extends AppCompatActivity {
         }
 
         mDecorView = getWindow().getDecorView();
-        findViewById(R.id.toggleStatusBarVisi).setOnClickListener(new View.OnClickListener() {
+        mToggleStatusBarVisi = (TextView) findViewById(R.id.toggleStatusBarVisi);
+        mToggleStatusBarVisi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mStatusBarHide) {
@@ -37,6 +40,20 @@ public class ImmersiveModeActivity extends AppCompatActivity {
                     hideStatusBar();
                 }
                 mStatusBarHide = !mStatusBarHide;
+                mToggleStatusBarVisi.setText(getString(R.string.toggleStatusbarVisi, (mStatusBarHide ? ": hide" : ": show")));
+            }
+        });
+        mToggleStatusBarVisi.setText(getString(R.string.toggleStatusbarVisi, (mStatusBarHide ? ": hide" : ": show")));
+
+        mContainer = findViewById(R.id.container);
+        mTextView = (TextView) findViewById(R.id.textView);
+        mTextView.setText(getString(R.string.coveredTextView, (mContainer.getFitsSystemWindows() ? "fitsSystemWindows" : "unfitsSystemWindows")));
+        mTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mContainer.setFitsSystemWindows(!mContainer.getFitsSystemWindows());
+                mTextView.setText(getString(R.string.coveredTextView, (mContainer.getFitsSystemWindows() ? "fitsSystemWindows" : "unfitsSystemWindows")));
+                mContainer.getParent().requestLayout();
             }
         });
 
@@ -52,7 +69,8 @@ public class ImmersiveModeActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.toggleBehindStatusBar).setOnClickListener(new View.OnClickListener() {
+        mToggleBehindStatusBar = (TextView) findViewById(R.id.toggleBehindStatusBar);
+        mToggleBehindStatusBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mBehindStatusBar) {
@@ -61,8 +79,11 @@ public class ImmersiveModeActivity extends AppCompatActivity {
                     behindStatusBar();
                 }
                 mBehindStatusBar = !mBehindStatusBar;
+                mToggleBehindStatusBar.setText(getString(R.string.toggleBehindStatusBar, (mBehindStatusBar ? ": behind" : ": not behind")));
             }
         });
+        mToggleBehindStatusBar.setText(getString(R.string.toggleBehindStatusBar, (mBehindStatusBar ? ": behind" : ": not behind")));
+
     }
 
     private void transparentStatusBar() {

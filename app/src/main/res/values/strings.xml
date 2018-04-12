@@ -3,7 +3,8 @@
     <string name="openActivity">打开%s</string>
     <string name="follow">关注</string>
     <string name="hidesystemui">hideSystemUI</string>
-    <string name="toggleStatusbarVisi">toggleStatusBar</string>
+    <string name="toggleStatusbarVisi">toggleStatusBar %s</string>
     <string name="toggleStatusBar">toggleStatusBarColor</string>
-    <string name="toggleBehindStatusBar">toggleBehindStatusBar</string>
+    <string name="toggleBehindStatusBar">toggleBehindStatusBar %s</string>
+    <string name="coveredTextView">我是会被遮挡的View \\n %s</string>
 </resources>

@@ -17,22 +17,24 @@
 package com.demo.playground.volley;
 
 import android.os.Process;
+import android.os.SystemClock;
+
+import java.util.concurrent.BlockingQueue;
 
 public class NetworkDispatcher extends Thread {
 
-//    private final BlockingQueue<Request<?>> mQueue;
-//    private final Network mNetwork;
-//    private final Cache mCache;
-//    private final ResponseDelivery mDelivery;
+    private final BlockingQueue<Request<?>> mQueue;
+    private final Network mNetwork;
+    private final Cache mCache;
+    private final ResponseDelivery mDelivery;
     private volatile boolean mQuit = false;
 
-//    public NetworkDispatcher(BlockingQueue<Request<?>> queue,
-//                             Network network, Cache cache, ResponseDelivery delivery) {
-//        mQueue = queue;
-//        mNetwork = network;
-//        mCache = cache;
-//        mDelivery = delivery;
-//    }
+    public NetworkDispatcher(BlockingQueue<Request<?>> queue, Network network, Cache cache, ResponseDelivery delivery) {
+        mQueue = queue;
+        mNetwork = network;
+        mCache = cache;
+        mDelivery = delivery;
+    }
 
     public void quit() {
         mQuit = true;
@@ -60,62 +62,62 @@ public class NetworkDispatcher extends Thread {
     // https://github.com/google/volley/issues/114
     private void processRequest() throws InterruptedException {
         // Take a request from the queue.
-//        Request<?> request = mQueue.take();
-//
-//        long startTimeMs = SystemClock.elapsedRealtime();
-//        try {
-//            request.addMarker("network-queue-take");
-//
-//            // If the request was cancelled already, do not perform the
-//            // network request.
-//            if (request.isCanceled()) {
-//                request.finish("network-discard-cancelled");
-//                request.notifyListenerResponseNotUsable();
-//                return;
-//            }
-//
-//            // Perform the network request.
-//            NetworkResponse networkResponse = mNetwork.performRequest(request);
-//            request.addMarker("network-http-complete");
-//
-//            // If the server returned 304 AND we delivered a response already,
-//            // we're done -- don't deliver a second identical response.
-//            if (networkResponse.notModified && request.hasHadResponseDelivered()) {
-//                request.finish("not-modified");
-//                request.notifyListenerResponseNotUsable();
-//                return;
-//            }
-//
-//            // Parse the response here on the worker thread.
-//            Response<?> response = request.parseNetworkResponse(networkResponse);
-//            request.addMarker("network-parse-complete");
-//
-//            // Write to cache if applicable.
-//            // TODO: Only update cache metadata instead of entire record for 304s.
+        Request<?> request = mQueue.take();
+
+        long startTimeMs = SystemClock.elapsedRealtime();
+        try {
+            request.addMarker("network-queue-take");
+
+            // If the request was cancelled already, do not perform the
+            // network request.
+            if (request.isCanceled()) {
+                request.finish("network-discard-cancelled");
+                request.notifyListenerResponseNotUsable();
+                return;
+            }
+
+            // Perform the network request.
+            NetworkResponse networkResponse = mNetwork.performRequest(request);
+            request.addMarker("network-http-complete");
+
+            // If the server returned 304 AND we delivered a response already,
+            // we're done -- don't deliver a second identical response.
+            if (networkResponse.notModified && request.hasHadResponseDelivered()) {
+                request.finish("not-modified");
+                request.notifyListenerResponseNotUsable();
+                return;
+            }
+
+            // Parse the response here on the worker thread.
+            Response<?> response = request.parseNetworkResponse(networkResponse);
+            request.addMarker("network-parse-complete");
+
+            // Write to cache if applicable.
+            // TODO: Only update cache metadata instead of entire record for 304s.
 //            if (request.shouldCache() && response.cacheEntry != null) {
 //                mCache.put(request.getCacheKey(), response.cacheEntry);
 //                request.addMarker("network-cache-written");
 //            }
-//
-//            // Post the response back.
-//            request.markDelivered();
-//            mDelivery.postResponse(request, response);
-//            request.notifyListenerResponseReceived(response);
-//        } catch (VolleyError volleyError) {
-//            volleyError.setNetworkTimeMs(SystemClock.elapsedRealtime() - startTimeMs);
-//            parseAndDeliverNetworkError(request, volleyError);
-//            request.notifyListenerResponseNotUsable();
-//        } catch (Exception e) {
-//            VolleyLog.e(e, "Unhandled exception %s", e.toString());
-//            VolleyError volleyError = new VolleyError(e);
-//            volleyError.setNetworkTimeMs(SystemClock.elapsedRealtime() - startTimeMs);
-//            mDelivery.postError(request, volleyError);
-//            request.notifyListenerResponseNotUsable();
-//        }
+
+            // Post the response back.
+            request.markDelivered();
+            mDelivery.postResponse(request, response);
+            request.notifyListenerResponseReceived(response);
+        } catch (VolleyError volleyError) {
+            volleyError.setNetworkTimeMs(SystemClock.elapsedRealtime() - startTimeMs);
+            parseAndDeliverNetworkError(request, volleyError);
+            request.notifyListenerResponseNotUsable();
+        } catch (Exception e) {
+            VolleyLog.e(e, "Unhandled exception %s", e.toString());
+            VolleyError volleyError = new VolleyError(e);
+            volleyError.setNetworkTimeMs(SystemClock.elapsedRealtime() - startTimeMs);
+            mDelivery.postError(request, volleyError);
+            request.notifyListenerResponseNotUsable();
+        }
     }
 
     private void parseAndDeliverNetworkError(Request<?> request, VolleyError error) {
-//        error = request.parseNetworkError(error);
-//        mDelivery.postError(request, error);
+        error = request.parseNetworkError(error);
+        mDelivery.postError(request, error);
     }
 }

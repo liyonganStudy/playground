@@ -1,5 +1,8 @@
 package com.demo.playground.volley;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -12,60 +15,34 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 
 public class RequestQueue {
-    /** Callback interface for completed requests. */
-    public interface RequestFinishedListener<T> {
-        /** Called when a request has finished processing. */
-        void onRequestFinished(Request<T> request);
-    }
 
-    /** Used for generating monotonically-increasing sequence numbers for requests. */
-    private final AtomicInteger mSequenceGenerator = new AtomicInteger();
-
-    /**
-     * The set of all requests currently being processed by this RequestQueue. A Request
-     * will be in this set if it is waiting in any queue or currently being processed by
-     * any dispatcher.
-     */
-    private final Set<Request<?>> mCurrentRequests = new HashSet<Request<?>>();
-
-    /** The cache triage queue. */
-    private final PriorityBlockingQueue<Request<?>> mCacheQueue =
-            new PriorityBlockingQueue<>();
-
-    /** The queue of requests that are actually going out to the network. */
-    private final PriorityBlockingQueue<Request<?>> mNetworkQueue =
-            new PriorityBlockingQueue<>();
-
-    /** Number of network request dispatcher threads to start. */
-    private static final int DEFAULT_NETWORK_THREAD_POOL_SIZE = 4;
-
-    /** Cache interface for retrieving and storing responses. */
-//    private final Cache mCache;
-
-    /** Network interface for performing requests. */
-//    private final Network mNetwork;
-
-    /** Response delivery mechanism. */
-//    private final ResponseDelivery mDelivery;
-
-    /** The network dispatchers. */
-//    private final NetworkDispatcher[] mDispatchers;
-
-    /** The cache dispatcher. */
-//    private CacheDispatcher mCacheDispatcher;
-
-    private final List<RequestFinishedListener> mFinishedListeners = new ArrayList<>();
-
-//    public RequestQueue(Cache cache, Network network, int threadPoolSize, ResponseDelivery delivery) {
-//        mCache = cache;
-//        mNetwork = network;
-//        mDispatchers = new NetworkDispatcher[threadPoolSize];
-//        mDelivery = delivery;
+//    public interface RequestFinishedListener<T> {
+//        void onRequestFinished(Request<T> request);
 //    }
 
+    private static final int DEFAULT_NETWORK_THREAD_POOL_SIZE = 4;
+    private final AtomicInteger mSequenceGenerator = new AtomicInteger();
+    private final Set<Request<?>> mCurrentRequests = new HashSet<Request<?>>();
+    private final PriorityBlockingQueue<Request<?>> mCacheQueue = new PriorityBlockingQueue<>();
+    private final PriorityBlockingQueue<Request<?>> mNetworkQueue = new PriorityBlockingQueue<>();
+    private final NetworkDispatcher[] mDispatchers;
+//    private CacheDispatcher mCacheDispatcher;
+//    private final List<RequestFinishedListener> mFinishedListeners = new ArrayList<>();
+
+    private final Cache mCache;
+    private final Network mNetwork;
+    private final ResponseDelivery mDelivery;
+
+
+    public RequestQueue(Cache cache, Network network, int threadPoolSize, ResponseDelivery delivery) {
+        mDispatchers = new NetworkDispatcher[threadPoolSize];
+        mCache = cache;
+        mNetwork = network;
+        mDelivery = delivery;
+    }
+
     public RequestQueue(Cache cache, Network network, int threadPoolSize) {
-//        this(cache, network, threadPoolSize,
-//                new ExecutorDelivery(new Handler(Looper.getMainLooper())));
+        this(cache, network, threadPoolSize, new ExecutorDelivery(new Handler(Looper.getMainLooper())));
     }
 
     public RequestQueue(Cache cache, Network network) {
@@ -74,43 +51,34 @@ public class RequestQueue {
 
     public void start() {
         stop();
-        // Make sure any currently running dispatchers are stopped.
-        // Create the cache dispatcher and start it.
 //        mCacheDispatcher = new CacheDispatcher(mCacheQueue, mNetworkQueue, mCache, mDelivery);
 //        mCacheDispatcher.start();
 
-        // Create network dispatchers (and corresponding threads) up to the pool size.
-//        for (int i = 0; i < mDispatchers.length; i++) {
-//            NetworkDispatcher networkDispatcher = new NetworkDispatcher(mNetworkQueue, mNetwork,
-//                    mCache, mDelivery);
-//            mDispatchers[i] = networkDispatcher;
-//            networkDispatcher.start();
-//        }
+        for (int i = 0; i < mDispatchers.length; i++) {
+            NetworkDispatcher networkDispatcher = new NetworkDispatcher(mNetworkQueue, mNetwork, mCache, mDelivery);
+            mDispatchers[i] = networkDispatcher;
+            networkDispatcher.start();
+        }
     }
 
     public void stop() {
 //        if (mCacheDispatcher != null) {
 //            mCacheDispatcher.quit();
 //        }
-//        for (final NetworkDispatcher mDispatcher : mDispatchers) {
-//            if (mDispatcher != null) {
-//                mDispatcher.quit();
-//            }
-//        }
+        for (final NetworkDispatcher mDispatcher : mDispatchers) {
+            if (mDispatcher != null) {
+                mDispatcher.quit();
+            }
+        }
     }
 
     public <T> Request<T> add(Request<T> request) {
-        // Tag the request as belonging to this queue and add it to the set of current requests.
         request.setRequestQueue(this);
         synchronized (mCurrentRequests) {
             mCurrentRequests.add(request);
         }
-
-        // Process requests in the order they are added.
         request.setSequence(getSequenceNumber());
         request.addMarker("add-to-queue");
-
-        // If the request is uncacheable, skip the cache queue and go straight to the network.
         if (!request.shouldCache()) {
             mNetworkQueue.add(request);
             return request;
@@ -121,5 +89,38 @@ public class RequestQueue {
 
     private int getSequenceNumber() {
         return mSequenceGenerator.incrementAndGet();
+    }
+
+    public interface RequestFilter {
+        boolean apply(Request<?> request);
+    }
+
+    public void cancelAll(RequestFilter filter) {
+        synchronized (mCurrentRequests) {
+            for (Request<?> request : mCurrentRequests) {
+                if (filter.apply(request)) {
+                    request.cancel();
+                }
+            }
+        }
+    }
+
+    public void cancelAll(final Object tag) {
+        if (tag == null) {
+            throw new IllegalArgumentException("Cannot cancelAll with a null tag");
+        }
+        cancelAll(new RequestFilter() {
+            @Override
+            public boolean apply(Request<?> request) {
+                return request.getTag() == tag;
+            }
+        });
+    }
+
+    <T> void finish(Request<T> request) {
+        // Remove from the set of requests currently being processed.
+        synchronized (mCurrentRequests) {
+            mCurrentRequests.remove(request);
+        }
     }
 }

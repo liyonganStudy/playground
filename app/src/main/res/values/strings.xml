@@ -7,4 +7,5 @@
     <string name="toggleStatusBar">toggleStatusBarColor</string>
     <string name="toggleBehindStatusBar">toggleBehindStatusBar %s</string>
     <string name="coveredTextView">我是会被遮挡的View \\n %s</string>
+    <string name="toggleImmersion">使用Immersion flag： %s</string>
 </resources>

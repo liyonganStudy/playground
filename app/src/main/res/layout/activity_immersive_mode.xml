@@ -22,10 +22,15 @@
             android:layout_width="200dp"
             android:layout_height="80dp"
             android:gravity="center"
-            android:background="@color/colorAccent"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"/>
+            android:background="@color/colorAccent" />
     </FrameLayout>
+
+    <Button
+        android:id="@+id/toggleImmersion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/toggleStatusBarVisi"
+        android:layout_alignStart="@+id/toggleStatusBarVisi" />
 
     <Button
         android:id="@+id/toggleStatusBar"

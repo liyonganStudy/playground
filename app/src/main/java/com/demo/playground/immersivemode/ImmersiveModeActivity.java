@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.demo.playground.R;
@@ -14,11 +15,12 @@ import com.demo.playground.utils.CompatibleUtils;
 public class ImmersiveModeActivity extends AppCompatActivity {
 
     private View mDecorView, mContainer;
-    private TextView mToggleStatusBarVisi, mToggleBehindStatusBar, mTextView;
+    private TextView mToggleStatusBarVisi, mToggleBehindStatusBar, mTextView, mToggleImmersion;
     private int mStatusBarColor;
     private boolean mTransparentStatusBar;
     private boolean mStatusBarHide;
     private boolean mBehindStatusBar;
+    private boolean mUseImmersion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +86,32 @@ public class ImmersiveModeActivity extends AppCompatActivity {
         });
         mToggleBehindStatusBar.setText(getString(R.string.toggleBehindStatusBar, (mBehindStatusBar ? ": behind" : ": not behind")));
 
+        mToggleImmersion = (Button) findViewById(R.id.toggleImmersion);
+        mToggleImmersion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mUseImmersion) {
+                    unUseImmersion();
+                } else {
+                    useImmersion();
+                }
+                mUseImmersion = !mUseImmersion;
+                mToggleImmersion.setText(getString(R.string.toggleImmersion, mUseImmersion + ""));
+            }
+        });
+        mToggleImmersion.setText(getString(R.string.toggleImmersion, mUseImmersion + ""));
+    }
+
+    private void useImmersion() {
+        if (CompatibleUtils.isVersionKitkatAndUp()) {
+            mDecorView.setSystemUiVisibility(mDecorView.getSystemUiVisibility() | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        }
+    }
+
+    private void unUseImmersion() {
+        if (CompatibleUtils.isVersionKitkatAndUp()) {
+            mDecorView.setSystemUiVisibility(mDecorView.getSystemUiVisibility() & ~View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        }
     }
 
     private void transparentStatusBar() {
@@ -132,7 +160,7 @@ public class ImmersiveModeActivity extends AppCompatActivity {
 
     private void unBehindStatusBar() {
         if (CompatibleUtils.isVersionKitkatAndUp()) {
-            mDecorView.setSystemUiVisibility(mDecorView.getSystemUiVisibility() & ~View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN );
+            mDecorView.setSystemUiVisibility((mDecorView.getSystemUiVisibility() & ~View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN));
         } else {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN); // need test
         }

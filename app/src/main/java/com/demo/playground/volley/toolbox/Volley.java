@@ -14,6 +14,10 @@ import java.io.File;
 public class Volley {
     private static final String DEFAULT_CACHE_DIR = "volley";
 
+    public static RequestQueue newRequestQueue(Context context) {
+        return newRequestQueue(context, (HttpStack) null);
+    }
+
     public static RequestQueue newRequestQueue(Context context, HttpStack stack) {
         BasicNetwork network;
         if (stack == null) {
@@ -22,10 +26,6 @@ public class Volley {
             network = new BasicNetwork(stack);
         }
         return newRequestQueue(context, network);
-    }
-
-    public static RequestQueue newRequestQueue(Context context) {
-        return newRequestQueue(context, (HttpStack) null);
     }
 
     private static RequestQueue newRequestQueue(Context context, Network network) {

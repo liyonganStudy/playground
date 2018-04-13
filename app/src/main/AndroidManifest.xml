@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.demo.playground">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".MyApplication"
@@ -23,6 +23,7 @@
         <activity android:name=".scrolllyric.ScrollLyricActivity" />
         <activity android:name=".immersivemode.ImmersiveModeActivity" />
         <activity android:name=".animation.SimpleAnimationActivity" />
+        <activity android:name=".volley.toolbox.VolleyTestActivity"></activity>
     </application>
 
 </manifest>

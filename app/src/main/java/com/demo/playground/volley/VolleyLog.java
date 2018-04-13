@@ -32,29 +32,14 @@ import java.util.Locale;
 public class VolleyLog {
     public static String TAG = "Volley";
 
-    public static boolean DEBUG = Log.isLoggable(TAG, Log.VERBOSE);
+//    public static boolean DEBUG = Log.isLoggable(TAG, Log.VERBOSE);
+    public static boolean DEBUG = true;
 
     /**
      * {@link Class#getName()} uses reflection and calling it on a potentially hot code path may
      * have some cost. To minimize this cost we fetch class name once here and use it later.
      */
     private static final String CLASS_NAME = VolleyLog.class.getName();
-
-    /**
-     * Customize the log tag for your application, so that other apps
-     * using Volley don't mix their logs with yours.
-     * <br>
-     * Enable the log property for your tag before starting your app:
-     * <br>
-     * {@code adb shell setprop log.tag.&lt;tag&gt;}
-     */
-    public static void setTag(String tag) {
-        d("Changing log tag to %s", tag);
-        TAG = tag;
-
-        // Reinitialize the DEBUG "constant"
-        DEBUG = Log.isLoggable(TAG, Log.VERBOSE);
-    }
 
     public static void v(String format, Object... args) {
         if (DEBUG) {

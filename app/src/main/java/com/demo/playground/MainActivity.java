@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
             }
             listView.setAdapter(new ActivityAdapter(activityNames, MainActivity.this));
         } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
     }
 

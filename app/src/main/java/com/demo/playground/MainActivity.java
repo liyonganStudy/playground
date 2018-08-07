@@ -39,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
             Log.i("lya", "onCreate: ");
-            Log.i("lya", "onCreate: ");
         }
     }
 

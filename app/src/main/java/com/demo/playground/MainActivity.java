@@ -40,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
             Log.i("lya", "onCreate: ");
             Log.i("lya", "onCreate: ");
-            Log.i("lya", "onCreate: ");
         }
     }
 

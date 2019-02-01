@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.demo.playground">
+          package="com.demo.playground">
 
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:name=".MyApplication"
@@ -13,17 +13,21 @@
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".snowanimate.SnowAnimateActivity" />
-        <activity android:name=".lockscreen.LockScreenActivity" />
-        <activity android:name=".scrolllyric.ScrollLyricActivity" />
-        <activity android:name=".immersivemode.ImmersiveModeActivity" />
-        <activity android:name=".animation.SimpleAnimationActivity" />
-        <activity android:name=".volley.toolbox.VolleyTestActivity"></activity>
+        <activity android:name=".snowanimate.SnowAnimateActivity"/>
+        <activity android:name=".lockscreen.LockScreenActivity"/>
+        <activity android:name=".scrolllyric.ScrollLyricActivity"/>
+        <activity android:name=".immersivemode.ImmersiveModeActivity"/>
+        <activity android:name=".animation.SimpleAnimationActivity"/>
+        <activity android:name=".volley.toolbox.VolleyTestActivity"/>
+        <activity android:name=".bubble.BubbleActivity"/>
+        <activity android:name=".dispatcher.TimeCostTaskActivity"/>
+        <activity android:name=".nestedscroll.NestedScrollActivity">
+        </activity>
     </application>
 
 </manifest>

@@ -20,22 +20,24 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.LinearLayout;
 
 import com.demo.playground.R;
-import com.demo.playground.utils.DimensionUtils;
 
 /**
  * Created by liyongan on 19/1/29.
  */
 
 public class AdjustableHeaderLinearLayout extends LinearLayout implements NestedScrollingParent2 {
-    private View mHeaderView, mSecondView;
+    private View mHeaderView;
+    private View mSecondView; // TODO: 19/2/1  删除
     private NestedScrollingParentHelper mScrollingParentHelper;
     private boolean mNeedHackDispatchTouch;
     private boolean mTouchDownOnHeader;
     private ValueAnimator mRevertAnimation;
     private HeaderScrollListener mHeaderScrollListener;
+    private int mMinHeaderHeight;
 
     private boolean mNeedDragOver, mHeaderHasPicBg;
     private int mStickHeaderHeight;
+    private int mMaxHeaderHeight;
 
     public AdjustableHeaderLinearLayout(Context context) {
         this(context, null);
@@ -79,6 +81,10 @@ public class AdjustableHeaderLinearLayout extends LinearLayout implements Nested
 
     public void setHeaderScrollListener(HeaderScrollListener headerScrollListener) {
         mHeaderScrollListener = headerScrollListener;
+    }
+
+    public void setMaxHeaderHeight(int maxHeaderHeight) {
+        mMaxHeaderHeight = maxHeaderHeight;
     }
 
     @Override
@@ -165,12 +171,12 @@ public class AdjustableHeaderLinearLayout extends LinearLayout implements Nested
         return MotionEvent.obtain(event.getDownTime(), event.getEventTime(), event.getAction(), event.getPointerCount(), pointerProperties, pointerCoords, event.getMetaState(), event.getButtonState(), event.getXPrecision(), event.getYPrecision(), event.getDeviceId(), event.getEdgeFlags(), event.getSource(), event.getFlags());
     }
 
-    private int getMaxHeaderHeight() { // TODO: 19/1/31
-        return DimensionUtils.dpToPx(400);
+    private int getMaxHeaderHeight() {
+        return mMaxHeaderHeight;
     }
 
-    private int getMinHeaderHeight() { // TODO: 19/1/31
-        return DimensionUtils.dpToPx(300);
+    private int getMinHeaderHeight() {
+        return mMinHeaderHeight;
     }
 
     private int getMaxNeedHideHeight() {
@@ -185,9 +191,12 @@ public class AdjustableHeaderLinearLayout extends LinearLayout implements Nested
     }
 
     @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) { // TODO: 19/1/31
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec + DimensionUtils.dpToPx(250));
-//        setMeasuredDimension(getMeasuredWidth(), getMeasuredHeight() + mHeaderView.getMeasuredHeight());
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        if (mMinHeaderHeight == 0) {
+            mHeaderView.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+            mMinHeaderHeight = mHeaderView.getLayoutParams().height;
+        }
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec + getMaxNeedHideHeight());
     }
 
     @Override
@@ -195,8 +204,15 @@ public class AdjustableHeaderLinearLayout extends LinearLayout implements Nested
         if (y < 0) {
             y = 0;
         }
-        if (y > getMaxNeedHideHeight()) {
-            y = getMaxNeedHideHeight();
+        int needHideHeight = getMaxNeedHideHeight();
+        if (y > needHideHeight) {
+            y = needHideHeight;
+        }
+        if (y == 0) {
+            mHeaderScrollListener.onHeaderTotalShow();
+        }
+        if (y == needHideHeight) {
+            mHeaderScrollListener.onHeaderTotalHide();
         }
         if (mHeaderScrollListener != null) {
             mHeaderScrollListener.onScroll(y);
@@ -233,7 +249,7 @@ public class AdjustableHeaderLinearLayout extends LinearLayout implements Nested
 
     @Override
     public void onNestedPreScroll(@NonNull View target, int dx, int dy, int[] consumed, int type) {
-        if (dy > 0) { // 向上
+        if (dy > 0) {
             if (mNeedDragOver && getScrollY() == 0 && mHeaderView.getLayoutParams().height > getMinHeaderHeight() && type == ViewCompat.TYPE_TOUCH) {
                 consumed[1] = dy;
                 final int finalDy = dy;
@@ -248,7 +264,7 @@ public class AdjustableHeaderLinearLayout extends LinearLayout implements Nested
                 scrollBy(0, dy);
                 consumed[1] = dy;
             }
-        } else { // 向下
+        } else {
             boolean canScrollDown = target.canScrollVertically(-1);
             if (!canScrollDown) {
                 if (getScrollY() > 0) {
@@ -278,6 +294,22 @@ public class AdjustableHeaderLinearLayout extends LinearLayout implements Nested
 
     public interface HeaderScrollListener {
         void onScroll(int dy);
+
+        void onHeaderTotalHide();
+
+        void onHeaderTotalShow();
+    }
+
+    public class SimpleHeaderScrollListener implements HeaderScrollListener {
+
+        @Override
+        public void onScroll(int dy) {}
+
+        @Override
+        public void onHeaderTotalHide() {}
+
+        @Override
+        public void onHeaderTotalShow() {}
     }
 
 }

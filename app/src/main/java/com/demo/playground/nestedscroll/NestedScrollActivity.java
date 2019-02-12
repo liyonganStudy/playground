@@ -13,12 +13,11 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.demo.playground.R;
+import com.demo.playground.utils.DimensionUtils;
 
 import java.util.ArrayList;
 
 public class NestedScrollActivity extends AppCompatActivity {
-    private TabLayout tabLayout;
-    private ViewPager viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,15 +46,26 @@ public class NestedScrollActivity extends AppCompatActivity {
             public void onScroll(int dy) {
                 bg.setTranslationY(dy / 2);
             }
+
+            @Override
+            public void onHeaderTotalHide() {
+                Toast.makeText(NestedScrollActivity.this, "header hide", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onHeaderTotalShow() {
+                Toast.makeText(NestedScrollActivity.this, "header show", Toast.LENGTH_SHORT).show();
+            }
         });
+        nestedScrollParentLinearLayout.setMaxHeaderHeight(DimensionUtils.dpToPx(400));
         findViewById(R.id.textView).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(NestedScrollActivity.this, "I am textView", Toast.LENGTH_SHORT).show();
             }
         });
-        tabLayout = findViewById(R.id.tabLayout);
-        viewPager = findViewById(R.id.viewpager);
+        TabLayout tabLayout = findViewById(R.id.tabLayout);
+        ViewPager viewPager = findViewById(R.id.viewpager);
 
         String[] titles = new String[]{"最新", "热门", "我的"};
         ArrayList<Fragment> fragments = new ArrayList<>();

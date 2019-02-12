@@ -83,10 +83,6 @@ public class AdjustableHeaderLinearLayout extends LinearLayout implements Nested
         mHeaderScrollListener = headerScrollListener;
     }
 
-    public void setMaxHeaderHeight(int maxHeaderHeight) {
-        mMaxHeaderHeight = maxHeaderHeight;
-    }
-
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         int action = ev.getActionMasked();
@@ -137,25 +133,6 @@ public class AdjustableHeaderLinearLayout extends LinearLayout implements Nested
         return animator;
     }
 
-    private static class HeightProperty extends Property<View, Integer> {
-
-        HeightProperty() {
-            super(Integer.class, "height");
-        }
-
-        @Override
-        public Integer get(View object) {
-            return object.getHeight();
-        }
-
-        @Override
-        public void set(View object, Integer value) {
-            object.getLayoutParams().height = value;
-            object.setLayoutParams(object.getLayoutParams());
-        }
-    }
-
-
     private MotionEvent obtainNewMotionEvent(MotionEvent event) {
         MotionEvent.PointerProperties[] pointerProperties = new MotionEvent.PointerProperties[event.getPointerCount()];
         for (int i = 0; i < event.getPointerCount(); i++) {
@@ -173,6 +150,10 @@ public class AdjustableHeaderLinearLayout extends LinearLayout implements Nested
 
     private int getMaxHeaderHeight() {
         return mMaxHeaderHeight;
+    }
+
+    public void setMaxHeaderHeight(int maxHeaderHeight) {
+        mMaxHeaderHeight = maxHeaderHeight;
     }
 
     private int getMinHeaderHeight() {
@@ -248,7 +229,7 @@ public class AdjustableHeaderLinearLayout extends LinearLayout implements Nested
     }
 
     @Override
-    public void onNestedPreScroll(@NonNull View target, int dx, int dy, int[] consumed, int type) {
+    public void onNestedPreScroll(@NonNull final View target, int dx, int dy, int[] consumed, int type) {
         if (dy > 0) {
             if (mNeedDragOver && getScrollY() == 0 && mHeaderView.getLayoutParams().height > getMinHeaderHeight() && type == ViewCompat.TYPE_TOUCH) {
                 consumed[1] = dy;
@@ -300,16 +281,37 @@ public class AdjustableHeaderLinearLayout extends LinearLayout implements Nested
         void onHeaderTotalShow();
     }
 
+    private static class HeightProperty extends Property<View, Integer> {
+
+        HeightProperty() {
+            super(Integer.class, "height");
+        }
+
+        @Override
+        public Integer get(View object) {
+            return object.getHeight();
+        }
+
+        @Override
+        public void set(View object, Integer value) {
+            object.getLayoutParams().height = value;
+            object.setLayoutParams(object.getLayoutParams());
+        }
+    }
+
     public class SimpleHeaderScrollListener implements HeaderScrollListener {
 
         @Override
-        public void onScroll(int dy) {}
+        public void onScroll(int dy) {
+        }
 
         @Override
-        public void onHeaderTotalHide() {}
+        public void onHeaderTotalHide() {
+        }
 
         @Override
-        public void onHeaderTotalShow() {}
+        public void onHeaderTotalShow() {
+        }
     }
 
 }

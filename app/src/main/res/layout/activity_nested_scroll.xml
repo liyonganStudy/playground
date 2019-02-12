@@ -12,7 +12,7 @@
     app:stickSectionHeight="50dp"
     tools:context="com.demo.playground.nestedscroll.NestedScrollActivity">
 
-    <RelativeLayout
+    <com.demo.playground.nestedscroll.MyRelativeLayout
         android:layout_width="match_parent"
         android:layout_height="300dp">
 
@@ -48,7 +48,7 @@
             android:background="#6300ff00"
             app:tabTextColor="#000000"/>
 
-    </RelativeLayout>
+    </com.demo.playground.nestedscroll.MyRelativeLayout>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewpager"

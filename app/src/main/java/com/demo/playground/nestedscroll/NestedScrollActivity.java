@@ -44,7 +44,7 @@ public class NestedScrollActivity extends AppCompatActivity {
         nestedScrollParentLinearLayout.setHeaderScrollListener(new AdjustableHeaderLinearLayout.HeaderScrollListener() {
             @Override
             public void onScroll(int dy) {
-                bg.setTranslationY(dy / 2);
+                bg.setTranslationY(dy / 2f);
             }
 
             @Override

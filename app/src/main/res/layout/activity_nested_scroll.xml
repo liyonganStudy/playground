@@ -8,7 +8,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     app:needDragOver="true"
-    app:headerHasPicBg="true"
     app:stickSectionHeight="50dp"
     tools:context="com.demo.playground.nestedscroll.NestedScrollActivity">
 
@@ -16,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="300dp">
 
-        <ImageView
+        <com.demo.playground.nestedscroll.MyImageView
             android:id="@+id/imageBg"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

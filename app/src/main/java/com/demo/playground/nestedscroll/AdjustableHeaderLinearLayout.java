@@ -1,18 +1,17 @@
 package com.demo.playground.nestedscroll;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Canvas;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.NestedScrollingParent2;
 import android.support.v4.view.NestedScrollingParentHelper;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
-import android.util.Property;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -26,16 +25,16 @@ import com.demo.playground.R;
  */
 
 public class AdjustableHeaderLinearLayout extends LinearLayout implements NestedScrollingParent2 {
+    private static final String TAG = "Adjustable";
     private View mHeaderView;
-    private View mSecondView; // TODO: 19/2/1  删除
     private NestedScrollingParentHelper mScrollingParentHelper;
     private boolean mNeedHackDispatchTouch;
     private boolean mTouchDownOnHeader;
     private ValueAnimator mRevertAnimation;
-    private HeaderScrollListener mHeaderScrollListener;
     private int mMinHeaderHeight;
 
-    private boolean mNeedDragOver, mHeaderHasPicBg;
+    private HeaderScrollListener mHeaderScrollListener;
+    private boolean mNeedDragOver;
     private int mStickHeaderHeight;
     private int mMaxHeaderHeight;
 
@@ -47,10 +46,8 @@ public class AdjustableHeaderLinearLayout extends LinearLayout implements Nested
         super(context, attrs);
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.AdjustableHeaderLinearLayout, 0, 0);
         mNeedDragOver = a.getBoolean(R.styleable.AdjustableHeaderLinearLayout_needDragOver, false);
-        mHeaderHasPicBg = a.getBoolean(R.styleable.AdjustableHeaderLinearLayout_headerHasPicBg, false);
         mStickHeaderHeight = a.getDimensionPixelSize(R.styleable.AdjustableHeaderLinearLayout_stickSectionHeight, 0);
         a.recycle();
-
         final GestureDetector gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onDown(MotionEvent e) {
@@ -83,12 +80,19 @@ public class AdjustableHeaderLinearLayout extends LinearLayout implements Nested
         mHeaderScrollListener = headerScrollListener;
     }
 
+    public void setMaxHeaderHeight(int maxHeaderHeight) {
+        mMaxHeaderHeight = maxHeaderHeight;
+        if (mMinHeaderHeight != 0) {
+            onMaxHeaderHeightChange(maxHeaderHeight);
+        }
+    }
+
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         int action = ev.getActionMasked();
         if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
             mNeedHackDispatchTouch = false;
-            if (mNeedDragOver && mHeaderView.getLayoutParams().height > getMinHeaderHeight()) {
+            if (mNeedDragOver && getScrollY() < 0) {
                 if (mRevertAnimation == null || !mRevertAnimation.isRunning()) {
                     mRevertAnimation = getRevertAnimation();
                     mRevertAnimation.start();
@@ -106,28 +110,7 @@ public class AdjustableHeaderLinearLayout extends LinearLayout implements Nested
 
     private ObjectAnimator getRevertAnimation() {
         ObjectAnimator animator;
-        if (mHeaderHasPicBg) {
-            animator = ObjectAnimator.ofInt(mHeaderView, new HeightProperty(), mHeaderView.getLayoutParams().height, getMinHeaderHeight());
-        } else {
-            animator = ObjectAnimator.ofFloat(mHeaderView, "translationY", 0, getMinHeaderHeight() - mHeaderView.getLayoutParams().height);
-            animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    float value = (float) animation.getAnimatedValue();
-                    mSecondView.setTranslationY(value);
-                }
-            });
-            animator.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    super.onAnimationEnd(animation);
-                    mHeaderView.getLayoutParams().height = getMinHeaderHeight();
-                    mHeaderView.setTranslationY(0);
-                    mSecondView.setTranslationY(0);
-                    mHeaderView.requestLayout();
-                }
-            });
-        }
+        animator = ObjectAnimator.ofInt(this, "scrollY", getScrollY(), 0);
         animator.setDuration(300);
         animator.setInterpolator(new DecelerateInterpolator());
         return animator;
@@ -143,60 +126,67 @@ public class AdjustableHeaderLinearLayout extends LinearLayout implements Nested
         for (int i = 0; i < event.getPointerCount(); i++) {
             pointerCoords[i] = new MotionEvent.PointerCoords();
             event.getPointerCoords(i, pointerCoords[i]);
-            pointerCoords[i].y = pointerCoords[i].y + getMinHeaderHeight();
+            pointerCoords[i].y = pointerCoords[i].y + mMinHeaderHeight;
         }
         return MotionEvent.obtain(event.getDownTime(), event.getEventTime(), event.getAction(), event.getPointerCount(), pointerProperties, pointerCoords, event.getMetaState(), event.getButtonState(), event.getXPrecision(), event.getYPrecision(), event.getDeviceId(), event.getEdgeFlags(), event.getSource(), event.getFlags());
     }
 
-    private int getMaxHeaderHeight() {
-        return mMaxHeaderHeight;
-    }
-
-    public void setMaxHeaderHeight(int maxHeaderHeight) {
-        mMaxHeaderHeight = maxHeaderHeight;
-    }
-
-    private int getMinHeaderHeight() {
-        return mMinHeaderHeight;
+    private void onMaxHeaderHeightChange(int maxHeaderHeight) {
+        mHeaderView.getLayoutParams().height = maxHeaderHeight;
+        ((MarginLayoutParams) mHeaderView.getLayoutParams()).topMargin = mMinHeaderHeight - maxHeaderHeight;
+        setHeaderViewPaddingTop(getMaxDragOverHeight());
     }
 
     private int getMaxNeedHideHeight() {
-        return getMinHeaderHeight() - mStickHeaderHeight;
+        return mMinHeaderHeight - mStickHeaderHeight;
     }
 
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
         mHeaderView = getChildAt(0);
-        mSecondView = getChildAt(1);
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        super.onLayout(changed, l, t, r, b);
+        Log.i(TAG, "onLayout: ");
+    }
+
+    @Override
+    public void invalidate() {
+        super.invalidate();
+        Log.i(TAG, "invalidate: ");
+    }
+
+    @Override
+    protected void dispatchDraw(Canvas canvas) {
+        super.dispatchDraw(canvas);
+        Log.i(TAG, "dispatchDraw: ");
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        Log.i(TAG, "onMeasure: ");
         if (mMinHeaderHeight == 0) {
             mHeaderView.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
             mMinHeaderHeight = mHeaderView.getLayoutParams().height;
+            if (mMaxHeaderHeight != 0 && mNeedDragOver) {
+                onMaxHeaderHeightChange(mMaxHeaderHeight);
+            }
         }
         super.onMeasure(widthMeasureSpec, heightMeasureSpec + getMaxNeedHideHeight());
     }
 
     @Override
     public void scrollTo(int x, int y) {
-        if (y < 0) {
-            y = 0;
+        int maxDragOverHeight = getMaxDragOverHeight();
+        if (y < -maxDragOverHeight) {
+            y = -maxDragOverHeight;
         }
         int needHideHeight = getMaxNeedHideHeight();
         if (y > needHideHeight) {
             y = needHideHeight;
-        }
-        if (y == 0) {
-            mHeaderScrollListener.onHeaderTotalShow();
-        }
-        if (y == needHideHeight) {
-            mHeaderScrollListener.onHeaderTotalHide();
-        }
-        if (mHeaderScrollListener != null) {
-            mHeaderScrollListener.onScroll(y);
         }
         super.scrollTo(x, y);
     }
@@ -207,6 +197,11 @@ public class AdjustableHeaderLinearLayout extends LinearLayout implements Nested
         if (mRevertAnimation != null) {
             mRevertAnimation.cancel();
         }
+    }
+
+    @Override
+    public int getNestedScrollAxes() {
+        return getScrollingParentHelper().getNestedScrollAxes();
     }
 
     @Override
@@ -231,30 +226,19 @@ public class AdjustableHeaderLinearLayout extends LinearLayout implements Nested
     @Override
     public void onNestedPreScroll(@NonNull final View target, int dx, int dy, int[] consumed, int type) {
         if (dy > 0) {
-            if (mNeedDragOver && getScrollY() == 0 && mHeaderView.getLayoutParams().height > getMinHeaderHeight() && type == ViewCompat.TYPE_TOUCH) {
+            if (getScrollY() < getMaxNeedHideHeight()) {
                 consumed[1] = dy;
-                final int finalDy = dy;
-                post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mHeaderView.getLayoutParams().height = Math.max(mHeaderView.getLayoutParams().height - finalDy, getMinHeaderHeight());
-                        mHeaderView.requestLayout();
-                    }
-                });
-            } else if (getScrollY() < getMaxNeedHideHeight()) {
                 scrollBy(0, dy);
-                consumed[1] = dy;
             }
         } else {
             boolean canScrollDown = target.canScrollVertically(-1);
             if (!canScrollDown) {
+                consumed[1] = dy;
                 if (getScrollY() > 0) {
-                    scrollBy(0, dy);
-                    consumed[1] = dy;
-                } else if (mNeedDragOver && getScrollY() == 0 && type == ViewCompat.TYPE_TOUCH) {
-                    if (mHeaderView.getLayoutParams().height <= getMaxHeaderHeight()) {
-                        mHeaderView.getLayoutParams().height -= dy;
-                        mHeaderView.requestLayout();
+                    scrollBy(0, getScrollY() + dy < 0 ? -getScrollY() : dy);
+                } else if (mNeedDragOver && type == ViewCompat.TYPE_TOUCH){
+                    if (getScrollY() > -getMaxDragOverHeight()) {
+                        scrollBy(0, dy);
                     }
                 }
             }
@@ -262,8 +246,27 @@ public class AdjustableHeaderLinearLayout extends LinearLayout implements Nested
     }
 
     @Override
-    public int getNestedScrollAxes() {
-        return getScrollingParentHelper().getNestedScrollAxes();
+    protected void onScrollChanged(int l, int t, int oldl, int oldt) {
+        super.onScrollChanged(l, t, oldl, oldt);
+        if (mHeaderScrollListener != null) {
+            if (oldt > 0 && t <=0) {
+                mHeaderScrollListener.onHeaderTotalShow();
+            } else if (t == getMaxNeedHideHeight()) {
+                mHeaderScrollListener.onHeaderTotalHide();
+            }
+            mHeaderScrollListener.onScroll(t > 0 ? t : 0);
+        }
+        if (t <= 0) {
+            setHeaderViewPaddingTop(getMaxDragOverHeight() + t);
+        }
+    }
+
+    private void setHeaderViewPaddingTop(int top) {
+        mHeaderView.setPadding(mHeaderView.getPaddingLeft(), top, mHeaderView.getPaddingRight(), mHeaderView.getPaddingBottom());
+    }
+
+    private int getMaxDragOverHeight() {
+        return mMaxHeaderHeight - mMinHeaderHeight;
     }
 
     private NestedScrollingParentHelper getScrollingParentHelper() {
@@ -279,24 +282,6 @@ public class AdjustableHeaderLinearLayout extends LinearLayout implements Nested
         void onHeaderTotalHide();
 
         void onHeaderTotalShow();
-    }
-
-    private static class HeightProperty extends Property<View, Integer> {
-
-        HeightProperty() {
-            super(Integer.class, "height");
-        }
-
-        @Override
-        public Integer get(View object) {
-            return object.getHeight();
-        }
-
-        @Override
-        public void set(View object, Integer value) {
-            object.getLayoutParams().height = value;
-            object.setLayoutParams(object.getLayoutParams());
-        }
     }
 
     public class SimpleHeaderScrollListener implements HeaderScrollListener {

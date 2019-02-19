@@ -2,32 +2,28 @@ package com.demo.playground.nestedscroll;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.widget.RelativeLayout;
 
 /**
- * Created by liyongan on 19/2/12.
+ * Created by liyongan on 19/2/16.
  */
 
-public class MyRelativeLayout extends RelativeLayout {
-    private static final String TAG = "MyRelativeLayout";
+public class MyImageView extends android.support.v7.widget.AppCompatImageView {
+    private static final String TAG = "MyImageView";
 
-    public MyRelativeLayout(Context context) {
+    public MyImageView(Context context) {
         super(context);
     }
 
-    public MyRelativeLayout(Context context, AttributeSet attrs) {
+    public MyImageView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public MyRelativeLayout(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-    }
-
     @Override
-    protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        super.onLayout(changed, l, t, r, b);
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
         Log.i(TAG, "onLayout: ");
     }
 
@@ -47,11 +43,5 @@ public class MyRelativeLayout extends RelativeLayout {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         Log.i(TAG, "onDraw: ");
-    }
-
-    @Override
-    protected void dispatchDraw(Canvas canvas) {
-        super.dispatchDraw(canvas);
-        Log.i(TAG, "dispatchDraw: ");
     }
 }

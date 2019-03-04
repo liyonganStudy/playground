@@ -10,7 +10,6 @@ import android.support.v4.view.NestedScrollingParent2;
 import android.support.v4.view.NestedScrollingParentHelper;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -148,7 +147,6 @@ public class AdjustableHeaderLinearLayout extends LinearLayout implements Nested
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        Log.i(TAG, "onMeasure: ");
         if (mMinHeaderHeight == 0) {
             mHeaderView.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
             mMinHeaderHeight = mHeaderView.getLayoutParams().height;

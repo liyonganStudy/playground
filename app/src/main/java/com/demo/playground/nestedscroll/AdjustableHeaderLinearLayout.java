@@ -4,7 +4,6 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Canvas;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.NestedScrollingParent2;
@@ -145,24 +144,6 @@ public class AdjustableHeaderLinearLayout extends LinearLayout implements Nested
     protected void onFinishInflate() {
         super.onFinishInflate();
         mHeaderView = getChildAt(0);
-    }
-
-    @Override
-    protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        super.onLayout(changed, l, t, r, b);
-        Log.i(TAG, "onLayout: ");
-    }
-
-    @Override
-    public void invalidate() {
-        super.invalidate();
-        Log.i(TAG, "invalidate: ");
-    }
-
-    @Override
-    protected void dispatchDraw(Canvas canvas) {
-        super.dispatchDraw(canvas);
-        Log.i(TAG, "dispatchDraw: ");
     }
 
     @Override

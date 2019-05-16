@@ -28,6 +28,8 @@
         <activity android:name=".dispatcher.TimeCostTaskActivity"/>
         <activity android:name=".nestedscroll.NestedScrollActivity">
         </activity>
+        <activity android:name=".coordinate.CoordinatorActivity">
+        </activity>
     </application>
 
 </manifest>

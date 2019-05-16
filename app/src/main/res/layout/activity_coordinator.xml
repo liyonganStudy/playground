@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/container"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.demo.playground.coordinate.CoordinatorActivity">
+
+    <TextView
+        android:id="@+id/childA"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="200dp"
+        android:background="#88ff0000"
+        android:gravity="center"
+        app:layout_behavior="com.demo.playground.coordinate.OverDragHeaderBehavior"
+        android:text="childA"/>
+
+    <TextView
+        android:id="@+id/childB"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="500dp"
+        android:background="#8800ff00"
+        android:gravity="center"
+        app:layout_behavior="com.demo.playground.coordinate.LayoutBehavior"
+        app:layout_anchor="@id/childA"
+        android:text="childB"/>
+
+</android.support.design.widget.CoordinatorLayout>
